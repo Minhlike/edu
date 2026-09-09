@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>Game Nối Từ Tiếng Anh - Tiếng Việt</title>
+    <style>
+        html, body { margin: 0; padding: 0; min-height: 100%; }
+        * { box-sizing: border-box; -webkit-box-sizing: border-box; }
+        body {
+            background: #f0fdf4;
+            color: #1f2937;
+            font-family: Arial, Helvetica, sans-serif;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+
+        .page {
+            width: 100%;
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 18px 12px 28px;
+        }
+
+        .header { text-align: center; margin-bottom: 18px; }
+        .title {
+            margin: 0 0 8px;
+            color: #15803d;
+            font-size: 30px;
+            line-height: 1.15;
+            font-weight: bold;
+        }
+        .subtitle {
+            margin: 0 0 14px;
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+        .puzzle-icon { font-size: 26px; vertical-align: 1px; }
+
+        .level-selectors { text-align: center; font-size: 0; }
+        .level-btn {
+            display: inline-block;
+            margin: 4px;
+            padding: 9px 13px;
+            border: 2px solid #e5e7eb;
+            border-radius: 22px;
+            background: #ffffff;
+            color: #4b5563;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+            line-height: 1.2;
+            font-weight: bold;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .level-btn:focus { outline: 2px solid #93c5fd; outline-offset: 2px; }
+        .level-btn.active {
+            background: #22c55e;
+            color: #ffffff;
+            border-color: #16a34a;
+            box-shadow: 0 3px 6px rgba(34,197,94,0.28);
+        }
+
+        .game-panel {
+            position: relative;
+            min-height: 400px;
+            padding: 16px;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow: 0 7px 20px rgba(0,0,0,0.12);
+            overflow: hidden;
+        }
+
+        .game-head { margin-bottom: 12px; overflow: hidden; }
+        .level-title {
+            float: left;
+            width: 64%;
+            margin: 4px 0 0;
+            color: #374151;
+            font-size: 19px;
+            line-height: 1.3;
+            font-weight: bold;
+        }
+        .score-pill {
+            float: right;
+            max-width: 35%;
+            padding: 7px 10px;
+            border-radius: 18px;
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 13px;
+            line-height: 1.2;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .clear { clear: both; height: 0; overflow: hidden; }
+
+        /*
+          Không dùng CSS Grid/Flex cho bàn chơi để tăng khả năng chạy trên
+          WebView/Android Browser và Safari iOS cũ. Inline-block là fallback ổn định.
+        */
+        .game-board {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            font-size: 0;
+            text-align: left;
+        }
+
+        .card {
+            position: relative;
+            display: inline-block;
+            vertical-align: top;
+            width: 48%;
+            min-height: 88px;
+            margin: 1%;
+            padding: 12px 7px;
+            border: 3px solid transparent;
+            border-radius: 12px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 17px;
+            line-height: 1.25;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            box-shadow: 0 4px 7px rgba(0,0,0,0.11);
+            -webkit-transition: -webkit-transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        .card:focus { outline: 2px solid #60a5fa; outline-offset: 1px; }
+        .card:active {
+            -webkit-transform: scale(.96);
+            transform: scale(.96);
+        }
+        .card.lang-en {
+            background: #e0f2fe;
+            color: #0369a1;
+            border-bottom-color: #bae6fd;
+        }
+        .card.lang-vi {
+            background: #fef08a;
+            color: #9a3412;
+            border-bottom-color: #fde047;
+        }
+        .card.selected {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,.25), 0 4px 7px rgba(0,0,0,.11);
+            -webkit-transform: scale(1.035);
+            transform: scale(1.035);
+            z-index: 2;
+        }
+        .audio-mark {
+            display: inline-block;
+            margin-left: 4px;
+            font-size: 12px;
+            font-weight: normal;
+            opacity: .58;
+        }
+        .card.matched {
+            pointer-events: none;
+            -webkit-animation: popOut .4s ease forwards;
+            animation: popOut .4s ease forwards;
+        }
+        .card.wrong {
+            border-color: #ef4444 !important;
+            -webkit-animation: shake .4s ease-in-out;
+            animation: shake .4s ease-in-out;
+        }
+
+        @-webkit-keyframes popOut {
+            0%   { -webkit-transform: scale(1); opacity: 1; }
+            50%  { -webkit-transform: scale(1.16); opacity: .82; }
+            100% { -webkit-transform: scale(0); opacity: 0; visibility: hidden; }
+        }
+        @keyframes popOut {
+            0%   { transform: scale(1); opacity: 1; }
+            50%  { transform: scale(1.16); opacity: .82; }
+            100% { transform: scale(0); opacity: 0; visibility: hidden; }
+        }
+        @-webkit-keyframes shake {
+            0%,100% { -webkit-transform: translateX(0); }
+            20%,60% { -webkit-transform: translateX(-5px); }
+            40%,80% { -webkit-transform: translateX(5px); }
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20%,60% { transform: translateX(-5px); }
+            40%,80% { transform: translateX(5px); }
+        }
+
+        .victory-screen {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            z-index: 20;
+            padding: 45px 20px 20px;
+            background: #ffffff;
+            background: rgba(255,255,255,.96);
+            text-align: center;
+        }
+        .victory-screen.show { display: block; }
+        .victory-emoji { margin-top: 40px; font-size: 52px; line-height: 1; }
+        .victory-title {
+            margin: 16px 0 6px;
+            color: #16a34a;
+            font-size: 30px;
+            line-height: 1.2;
+        }
+        .victory-text { margin: 0 0 22px; color: #4b5563; font-size: 15px; }
+        .next-btn {
+            padding: 12px 22px;
+            border: 0;
+            border-radius: 24px;
+            background: #3b82f6;
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            box-shadow: 0 4px 9px rgba(0,0,0,.18);
+        }
+        .next-btn:active { background: #2563eb; }
+
+        .audio-note {
+            display: none;
+            margin: 12px 0 0;
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.4;
+            text-align: center;
+        }
+        .footer { margin-top: 18px; color: #9ca3af; font-size: 12px; text-align: center; }
+
+        @media screen and (min-width: 560px) {
+            .card { width: 31.3333%; }
+        }
+        @media screen and (min-width: 760px) {
+            .card { width: 23%; }
+        }
+        @media screen and (max-width: 360px) {
+            .page { padding-left: 7px; padding-right: 7px; }
+            .game-panel { padding: 10px 8px 14px; }
+            .title { font-size: 25px; }
+            .level-title { width: 60%; font-size: 16px; }
+            .score-pill { max-width: 40%; font-size: 12px; padding: 6px 8px; }
+            .card { min-height: 82px; font-size: 15px; padding-left: 5px; padding-right: 5px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        <h1 class="title"><span class="puzzle-icon" aria-hidden="true">◆</span> Nối Từ Vựng</h1>
+        <p class="subtitle">Ghép thẻ tiếng Anh với nghĩa tiếng Việt tương ứng. Bấm thẻ tiếng Anh để nghe phát âm nếu thiết bị hỗ trợ.</p>
+        <div id="level-selectors" class="level-selectors"></div>
+    </div>
+
+    <div class="game-panel">
+        <div class="game-head">
+            <h2 id="level-title" class="level-title">Màn 1: Động vật</h2>
+            <div class="score-pill">Đã tìm: <span id="score">0</span> / <span id="total-pairs">0</span></div>
+            <div class="clear"></div>
+        </div>
+
+        <div id="game-board" class="game-board"></div>
+        <div id="audio-note" class="audio-note">Thiết bị/trình duyệt này không hỗ trợ đọc từ bằng giọng nói. Game vẫn chơi bình thường.</div>
+
+        <div id="victory-screen" class="victory-screen" aria-hidden="true">
+            <div class="victory-emoji">🎉</div>
+            <h2 class="victory-title">Chúc mừng!</h2>
+            <p class="victory-text">Bạn đã hoàn thành màn chơi này.</p>
+            <button id="next-level-btn" class="next-btn" type="button">Chơi màn tiếp theo →</button>
+        </div>
+    </div>
+
+    <div class="footer">File độc lập, không cần Internet để tải giao diện hoặc thư viện ngoài.</div>
+</div>
+
+<script type="text/javascript">
+(function () {
+    'use strict';
+
+    /* ES5-only JavaScript để tăng tương thích với Safari/WebView/Android Browser cũ. */
+    var vocabularyData = [
+        {
+            title: 'Động vật',
+            pairs: [
+                { en: 'Dog', vi: 'Con chó' },
+                { en: 'Cat', vi: 'Con mèo' },
+                { en: 'Bird', vi: 'Con chim' },
+                { en: 'Elephant', vi: 'Con voi' },
+                { en: 'Tiger', vi: 'Con hổ' },
+                { en: 'Fish', vi: 'Con cá' }
+            ]
+        },
+        {
+            title: 'Màu sắc',
+            pairs: [
+                { en: 'Red', vi: 'Màu đỏ' },
+                { en: 'Blue', vi: 'Màu xanh dương' },
+                { en: 'Green', vi: 'Màu xanh lá' },
+                { en: 'Yellow', vi: 'Màu vàng' },
+                { en: 'Black', vi: 'Màu đen' },
+                { en: 'White', vi: 'Màu trắng' }
+            ]
+        },
+        {
+            title: 'Trái cây',
+            pairs: [
+                { en: 'Apple', vi: 'Quả táo' },
+                { en: 'Banana', vi: 'Quả chuối' },
+                { en: 'Orange', vi: 'Quả cam' },
+                { en: 'Grape', vi: 'Quả nho' },
+                { en: 'Watermelon', vi: 'Dưa hấu' },
+                { en: 'Mango', vi: 'Quả xoài' }
+            ]
+        },
+        {
+            title: 'Thời tiết',
+            pairs: [
+                { en: 'Sunny', vi: 'Trời nắng' },
+                { en: 'Rainy', vi: 'Trời mưa' },
+                { en: 'Windy', vi: 'Có gió' },
+                { en: 'Cloudy', vi: 'Nhiều mây' },
+                { en: 'Snowy', vi: 'Có tuyết' },
+                { en: 'Stormy', vi: 'Có bão' }
+            ]
+        }
+    ];
+
+    var currentLevelIndex = 0;
+    var cards = [];
+    var firstSelectedCard = null;
+    var matchedPairsCount = 0;
+    var totalPairs = 0;
+    var isProcessing = false;
+    var lastTouchTime = 0;
+
+    var boardElement;
+    var levelSelectorsElement;
+    var levelTitleElement;
+    var scoreElement;
+    var totalPairsElement;
+    var victoryScreen;
+    var nextLevelButton;
+    var audioNote;
+
+    function byId(id) {
+        return document.getElementById(id);
+    }
+
+    function setText(el, text) {
+        if (!el) { return; }
+        if (typeof el.textContent !== 'undefined') {
+            el.textContent = text;
+        } else {
+            el.innerText = text;
+        }
+    }
+
+    function hasClass(el, name) {
+        if (!el) { return false; }
+        return new RegExp('(^|\\s)' + name + '(\\s|$)').test(el.className);
+    }
+
+    function addClass(el, name) {
+        if (!el || hasClass(el, name)) { return; }
+        el.className = el.className ? el.className + ' ' + name : name;
+    }
+
+    function removeClass(el, name) {
+        var re;
+        if (!el) { return; }
+        re = new RegExp('(^|\\s)' + name + '(?=\\s|$)', 'g');
+        el.className = el.className.replace(re, ' ').replace(/^\\s+|\\s+$/g, '').replace(/\\s{2,}/g, ' ');
+    }
+
+    function bindEvent(el, eventName, handler) {
+        if (el.addEventListener) {
+            el.addEventListener(eventName, handler, false);
+        } else if (el.attachEvent) {
+            el.attachEvent('on' + eventName, handler);
+        } else {
+            el['on' + eventName] = handler;
+        }
+    }
+
+    /*
+      touchend xử lý nhanh trên màn hình cảm ứng cũ; click là fallback cho chuột/bàn phím.
+      Chặn click giả phát sinh ngay sau touch để không chọn thẻ hai lần.
+    */
+    function bindTap(el, handler) {
+        bindEvent(el, 'touchend', function (evt) {
+            var now = new Date().getTime();
+            lastTouchTime = now;
+            if (evt && evt.preventDefault) { evt.preventDefault(); }
+            handler(evt);
+        });
+        bindEvent(el, 'click', function (evt) {
+            var now = new Date().getTime();
+            if (now - lastTouchTime < 700) { return; }
+            handler(evt);
+        });
+    }
+
+    function speechSupported() {
+        return !!(window.speechSynthesis && window.SpeechSynthesisUtterance);
+    }
+
+    function playEnglishAudio(text) {
+        var utterance;
+        if (!speechSupported()) {
+            if (audioNote) { audioNote.style.display = 'block'; }
+            return;
+        }
+        try {
+            window.speechSynthesis.cancel();
+            utterance = new window.SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            window.speechSynthesis.speak(utterance);
+        } catch (e) {
+            if (audioNote) { audioNote.style.display = 'block'; }
+        }
+    }
+
+    function createLevelButtons() {
+        var i;
+        var btn;
+        levelSelectorsElement.innerHTML = '';
+        for (i = 0; i < vocabularyData.length; i += 1) {
+            btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'level-btn';
+            btn.id = 'btn-level-' + i;
+            btn.setAttribute('data-level-index', String(i));
+            setText(btn, 'Màn ' + (i + 1) + ': ' + vocabularyData[i].title);
+            bindTap(btn, function () {
+                var idx = parseInt(this.getAttribute('data-level-index'), 10);
+                loadLevel(idx);
+            });
+            levelSelectorsElement.appendChild(btn);
+        }
+    }
+
+    function updateActiveButton() {
+        var i;
+        var btn;
+        for (i = 0; i < vocabularyData.length; i += 1) {
+            btn = byId('btn-level-' + i);
+            removeClass(btn, 'active');
+        }
+        btn = byId('btn-level-' + currentLevelIndex);
+        addClass(btn, 'active');
+    }
+
+    function shuffle(array) {
+        var i;
+        var j;
+        var temp;
+        for (i = array.length - 1; i > 0; i -= 1) {
+            j = Math.floor(Math.random() * (i + 1));
+            temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+
+    function loadLevel(index) {
+        var levelData = vocabularyData[index];
+        var i;
+        var pair;
+
+        currentLevelIndex = index;
+        firstSelectedCard = null;
+        matchedPairsCount = 0;
+        isProcessing = false;
+        totalPairs = levelData.pairs.length;
+
+        updateActiveButton();
+        setText(levelTitleElement, 'Màn ' + (index + 1) + ': ' + levelData.title);
+        setText(scoreElement, '0');
+        setText(totalPairsElement, String(totalPairs));
+        removeClass(victoryScreen, 'show');
+        victoryScreen.setAttribute('aria-hidden', 'true');
+
+        cards = [];
+        for (i = 0; i < levelData.pairs.length; i += 1) {
+            pair = levelData.pairs[i];
+            cards.push({ id: 'en-' + i, matchId: i, text: pair.en, lang: 'en' });
+            cards.push({ id: 'vi-' + i, matchId: i, text: pair.vi, lang: 'vi' });
+        }
+
+        shuffle(cards);
+        renderBoard();
+    }
+
+    function makeCard(cardData, index) {
+        var cardEl = document.createElement('button');
+        var textSpan = document.createElement('span');
+        var audioSpan;
+
+        cardEl.type = 'button';
+        cardEl.className = 'card lang-' + cardData.lang;
+        cardEl.setAttribute('data-index', String(index));
+        cardEl.setAttribute('aria-label', cardData.text + (cardData.lang === 'en' ? ', tiếng Anh' : ', tiếng Việt'));
+        setText(textSpan, cardData.text);
+        cardEl.appendChild(textSpan);
+
+        if (cardData.lang === 'en') {
+            audioSpan = document.createElement('span');
+            audioSpan.className = 'audio-mark';
+            audioSpan.setAttribute('aria-hidden', 'true');
+            setText(audioSpan, '🔊');
+            cardEl.appendChild(audioSpan);
+        }
+
+        bindTap(cardEl, function () {
+            handleCardClick(cardEl, cardData);
+        });
+
+        return cardEl;
+    }
+
+    function renderBoard() {
+        var i;
+        boardElement.innerHTML = '';
+        for (i = 0; i < cards.length; i += 1) {
+            boardElement.appendChild(makeCard(cards[i], i));
+        }
+    }
+
+    function handleCardClick(cardEl, cardData) {
+        if (isProcessing || hasClass(cardEl, 'matched')) { return; }
+
+        if (cardData.lang === 'en') {
+            playEnglishAudio(cardData.text);
+        }
+
+        if (firstSelectedCard && firstSelectedCard.element === cardEl) {
+            removeClass(cardEl, 'selected');
+            firstSelectedCard = null;
+            return;
+        }
+
+        addClass(cardEl, 'selected');
+
+        if (!firstSelectedCard) {
+            firstSelectedCard = { element: cardEl, data: cardData };
+        } else {
+            evaluateMatch(cardEl, cardData);
+        }
+    }
+
+    function evaluateMatch(secondCardEl, secondCardData) {
+        var firstCardEl = firstSelectedCard.element;
+        var firstCardData = firstSelectedCard.data;
+        isProcessing = true;
+
+        if (firstCardData.matchId === secondCardData.matchId && firstCardData.lang !== secondCardData.lang) {
+            window.setTimeout(function () {
+                addClass(firstCardEl, 'matched');
+                addClass(secondCardEl, 'matched');
+                matchedPairsCount += 1;
+                setText(scoreElement, String(matchedPairsCount));
+                firstSelectedCard = null;
+                isProcessing = false;
+                checkWinCondition();
+            }, 280);
+        } else {
+            addClass(firstCardEl, 'wrong');
+            addClass(secondCardEl, 'wrong');
+
+            window.setTimeout(function () {
+                removeClass(firstCardEl, 'selected');
+                removeClass(firstCardEl, 'wrong');
+                removeClass(secondCardEl, 'selected');
+                removeClass(secondCardEl, 'wrong');
+                firstSelectedCard = null;
+                isProcessing = false;
+            }, 480);
+        }
+    }
+
+    function checkWinCondition() {
+        if (matchedPairsCount === totalPairs) {
+            window.setTimeout(function () {
+                addClass(victoryScreen, 'show');
+                victoryScreen.setAttribute('aria-hidden', 'false');
+            }, 520);
+        }
+    }
+
+    function nextLevel() {
+        var nextIdx = currentLevelIndex + 1;
+        if (nextIdx >= vocabularyData.length) {
+            nextIdx = 0;
+        }
+        loadLevel(nextIdx);
+    }
+
+    function initGame() {
+        boardElement = byId('game-board');
+        levelSelectorsElement = byId('level-selectors');
+        levelTitleElement = byId('level-title');
+        scoreElement = byId('score');
+        totalPairsElement = byId('total-pairs');
+        victoryScreen = byId('victory-screen');
+        nextLevelButton = byId('next-level-btn');
+        audioNote = byId('audio-note');
+
+        createLevelButtons();
+        bindTap(nextLevelButton, nextLevel);
+        if (!speechSupported()) {
+            audioNote.style.display = 'block';
+        }
+        loadLevel(0);
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        window.setTimeout(initGame, 0);
+    } else {
+        bindEvent(window, 'load', initGame);
+    }
+}());
+</script>
+</body>
+</html>
