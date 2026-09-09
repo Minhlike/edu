@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<title>Nối Từ Vựng</title>
+<style type="text/css">
+html,body{margin:0;padding:0;min-height:100%;}
+*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
+body{background:#f0fdf4;color:#1f2937;font-family:Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+a{-webkit-tap-highlight-color:rgba(0,0,0,0);}
+.page{width:100%;max-width:780px;margin:0 auto;padding:16px 10px 24px;}
+.header{text-align:center;margin-bottom:14px;}
+.title{margin:0 0 7px;color:#15803d;font-size:29px;line-height:1.15;font-weight:bold;}
+.subtitle{margin:0 4px 12px;color:#4b5563;font-size:14px;line-height:1.4;}
+/* Mobile-safe: one horizontal row instead of wrapping into 2 columns */
+.level-wrap{width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:2px 0 5px;white-space:nowrap;text-align:left;}
+.level-selectors{display:inline-block;white-space:nowrap;}
+.level-btn{display:inline-block;margin:3px 4px 3px 0;padding:9px 12px;border:2px solid #e5e7eb;border-radius:22px;background:#fff;color:#4b5563;font-size:13px;line-height:1.2;font-weight:bold;text-decoration:none;white-space:nowrap;vertical-align:middle;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+.level-btn.active{background:#22c55e;color:#fff;border-color:#16a34a;box-shadow:0 3px 6px rgba(34,197,94,.28);}
+.game-panel{position:relative;min-height:380px;padding:14px 10px;border-radius:18px;background:#fff;box-shadow:0 7px 20px rgba(0,0,0,.12);overflow:hidden;}
+.game-head{margin-bottom:11px;overflow:hidden;}
+.level-title{float:left;width:62%;margin:4px 0 0;color:#374151;font-size:18px;line-height:1.3;font-weight:bold;}
+.score-pill{float:right;max-width:37%;padding:7px 9px;border-radius:18px;background:#dcfce7;color:#15803d;font-size:12px;line-height:1.2;font-weight:bold;text-align:center;white-space:nowrap;}
+.clear{clear:both;height:0;overflow:hidden;}
+.status-warning{margin:0 0 11px;padding:9px 10px;border:1px solid #f59e0b;border-radius:8px;background:#fffbeb;color:#92400e;font-size:12px;line-height:1.4;text-align:left;}
+.game-board{width:100%;margin:0;padding:0;font-size:0;text-align:left;}
+.card{position:relative;display:inline-block;vertical-align:top;width:48%;min-height:84px;margin:1%;padding:12px 6px;border:3px solid transparent;border-radius:12px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.25;font-weight:bold;text-align:center;text-decoration:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(0,0,0,0);box-shadow:0 4px 7px rgba(0,0,0,.11);word-wrap:break-word;white-space:normal;overflow:hidden;}
+.card.lang-en{background:#e0f2fe;color:#0369a1;border-bottom-color:#bae6fd;}
+.card.lang-vi{background:#fef08a;color:#9a3412;border-bottom-color:#fde047;}
+.card.selected{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.25),0 4px 7px rgba(0,0,0,.11);}
+.card.wrong{border-color:#ef4444!important;}
+.card.matched{visibility:hidden;pointer-events:none;}
+.audio-mark{display:inline-block;margin-left:4px;font-size:11px;font-weight:normal;opacity:.6;}
+.victory-screen{position:absolute;left:0;top:0;right:0;bottom:0;display:none;z-index:20;padding:50px 20px 20px;background:#fff;text-align:center;}
+.victory-screen.show{display:block;}
+.victory-emoji{margin-top:35px;font-size:50px;line-height:1;}
+.victory-title{margin:14px 0 6px;color:#16a34a;font-size:29px;line-height:1.2;}
+.victory-text{margin:0 0 22px;color:#4b5563;font-size:15px;}
+.next-btn{display:inline-block;padding:12px 22px;border-radius:24px;background:#3b82f6;color:#fff;font-size:15px;font-weight:bold;text-decoration:none;box-shadow:0 4px 9px rgba(0,0,0,.18);-webkit-user-select:none;user-select:none;}
+.audio-note{display:none;margin:10px 0 0;color:#6b7280;font-size:12px;line-height:1.4;text-align:center;}
+.footer{margin-top:16px;color:#9ca3af;font-size:11px;line-height:1.4;text-align:center;}
+@media screen and (min-width:560px){.card{width:31.3333%;}}
+@media screen and (min-width:760px){.card{width:23%;}}
+@media screen and (max-width:360px){.page{padding-left:6px;padding-right:6px}.game-panel{padding:10px 6px 12px}.title{font-size:24px}.level-title{width:59%;font-size:16px}.score-pill{max-width:40%;font-size:11px;padding:6px 7px}.card{min-height:78px;font-size:14px;padding-left:4px;padding-right:4px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1 class="title">◆ Nối Từ Vựng</h1>
+    <p class="subtitle">Ghép thẻ tiếng Anh với nghĩa tiếng Việt tương ứng. Chạm thẻ tiếng Anh để nghe phát âm nếu thiết bị hỗ trợ.</p>
+    <div class="level-wrap">
+      <div id="level-selectors" class="level-selectors">
+        <a href="#" id="btn-level-0" class="level-btn active" onclick="return levelTap(event,0)" ontouchend="return levelTap(event,0)">Màn 1: Động vật</a>
+        <a href="#" id="btn-level-1" class="level-btn" onclick="return levelTap(event,1)" ontouchend="return levelTap(event,1)">Màn 2: Màu sắc</a>
+        <a href="#" id="btn-level-2" class="level-btn" onclick="return levelTap(event,2)" ontouchend="return levelTap(event,2)">Màn 3: Trái cây</a>
+        <a href="#" id="btn-level-3" class="level-btn" onclick="return levelTap(event,3)" ontouchend="return levelTap(event,3)">Màn 4: Thời tiết</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-panel">
+    <div class="game-head">
+      <h2 id="level-title" class="level-title">Màn 1: Động vật</h2>
+      <div class="score-pill">Đã tìm: <span id="score">0</span> / <span id="total-pairs">6</span></div>
+      <div class="clear"></div>
+    </div>
+
+    <div id="js-warning" class="status-warning"><b>JavaScript chưa chạy.</b> Nếu dòng này không tự biến mất sau khi mở file, ứng dụng đang dùng để xem HTML đã chặn JavaScript. Hãy mở chính file bằng Safari/Chrome để chơi.</div>
+
+    <div id="game-board" class="game-board">
+      <a href="#" class="card lang-en" data-match="0" data-lang="en" data-text="Dog" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Dog <span class="audio-mark">[loa]</span></a>
+      <a href="#" class="card lang-vi" data-match="3" data-lang="vi" data-text="Con voi" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Con voi</a>
+      <a href="#" class="card lang-en" data-match="2" data-lang="en" data-text="Bird" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Bird <span class="audio-mark">[loa]</span></a>
+      <a href="#" class="card lang-vi" data-match="0" data-lang="vi" data-text="Con chó" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Con chó</a>
+      <a href="#" class="card lang-en" data-match="4" data-lang="en" data-text="Tiger" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Tiger <span class="audio-mark">[loa]</span></a>
+      <a href="#" class="card lang-vi" data-match="5" data-lang="vi" data-text="Con cá" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Con cá</a>
+      <a href="#" class="card lang-en" data-match="1" data-lang="en" data-text="Cat" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Cat <span class="audio-mark">[loa]</span></a>
+      <a href="#" class="card lang-vi" data-match="2" data-lang="vi" data-text="Con chim" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Con chim</a>
+      <a href="#" class="card lang-en" data-match="5" data-lang="en" data-text="Fish" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Fish <span class="audio-mark">[loa]</span></a>
+      <a href="#" class="card lang-vi" data-match="4" data-lang="vi" data-text="Con hổ" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Con hổ</a>
+      <a href="#" class="card lang-en" data-match="3" data-lang="en" data-text="Elephant" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Elephant <span class="audio-mark">[loa]</span></a>
+      <a href="#" class="card lang-vi" data-match="1" data-lang="vi" data-text="Con mèo" onclick="return staticCardTap(event,this)" ontouchend="return staticCardTap(event,this)">Con mèo</a>
+    </div>
+
+    <div id="audio-note" class="audio-note">Thiết bị/trình duyệt này không hỗ trợ đọc từ bằng giọng nói. Game vẫn chơi bình thường.</div>
+
+    <div id="victory-screen" class="victory-screen">
+      <div class="victory-emoji">★</div>
+      <h2 class="victory-title">Chúc mừng!</h2>
+      <p class="victory-text">Bạn đã hoàn thành màn chơi này.</p>
+      <a href="#" class="next-btn" onclick="return nextLevelTap(event)" ontouchend="return nextLevelTap(event)">Chơi màn tiếp theo →</a>
+    </div>
+  </div>
+  <div class="footer">Không dùng thư viện/CDN ngoài. Nếu cảnh báo JavaScript biến mất thì game đã sẵn sàng nhận thao tác chạm.</div>
+</div>
+
+<script type="text/javascript">
+/* ES3-style JavaScript for old mobile browsers. */
+var vocabularyData=[
+ {title:'Động vật',pairs:[{en:'Dog',vi:'Con chó'},{en:'Cat',vi:'Con mèo'},{en:'Bird',vi:'Con chim'},{en:'Elephant',vi:'Con voi'},{en:'Tiger',vi:'Con hổ'},{en:'Fish',vi:'Con cá'}]},
+ {title:'Màu sắc',pairs:[{en:'Red',vi:'Màu đỏ'},{en:'Blue',vi:'Màu xanh dương'},{en:'Green',vi:'Màu xanh lá'},{en:'Yellow',vi:'Màu vàng'},{en:'Black',vi:'Màu đen'},{en:'White',vi:'Màu trắng'}]},
+ {title:'Trái cây',pairs:[{en:'Apple',vi:'Quả táo'},{en:'Banana',vi:'Quả chuối'},{en:'Orange',vi:'Quả cam'},{en:'Grape',vi:'Quả nho'},{en:'Watermelon',vi:'Dưa hấu'},{en:'Mango',vi:'Quả xoài'}]},
+ {title:'Thời tiết',pairs:[{en:'Sunny',vi:'Trời nắng'},{en:'Rainy',vi:'Trời mưa'},{en:'Windy',vi:'Có gió'},{en:'Cloudy',vi:'Nhiều mây'},{en:'Snowy',vi:'Có tuyết'},{en:'Stormy',vi:'Có bão'}]}
+];
+var currentLevelIndex=0,firstSelectedCard=null,matchedPairsCount=0,totalPairs=6,isProcessing=false;
+var lastTouchTime=0,lastTouchElement=null;
+function getEl(id){return document.getElementById(id);}
+function setText(el,text){if(!el){return;}if(typeof el.textContent!='undefined'){el.textContent=text;}else{el.innerText=text;}}
+function hasClass(el,name){return el&&(' '+el.className+' ').indexOf(' '+name+' ')!=-1;}
+function addClass(el,name){if(el&&!hasClass(el,name)){el.className+=(el.className?' ':'')+name;}}
+function removeClass(el,name){var a,i,o='';if(!el){return;}a=el.className.split(' ');for(i=0;i<a.length;i++){if(a[i]&&a[i]!=name){o+=(o?' ':'')+a[i];}}el.className=o;}
+function stopEvent(e){e=e||window.event;if(e){if(e.preventDefault){e.preventDefault();}e.returnValue=false;if(e.stopPropagation){e.stopPropagation();}e.cancelBubble=true;}return false;}
+function isDuplicateTap(e,el){var now=(new Date()).getTime();if(e&&e.type=='touchend'){lastTouchTime=now;lastTouchElement=el;return false;}if(e&&e.type=='click'&&lastTouchElement===el&&(now-lastTouchTime)<800){return true;}return false;}
+function playEnglishAudio(text){try{if(window.speechSynthesis&&window.SpeechSynthesisUtterance){window.speechSynthesis.cancel();var u=new window.SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.9;u.pitch=1;window.speechSynthesis.speak(u);}else{getEl('audio-note').style.display='block';}}catch(ex){if(getEl('audio-note')){getEl('audio-note').style.display='block';}}}
+function shuffle(a){var i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=a[i];a[i]=a[j];a[j]=t;}}
+function updateActiveButton(){var i,b;for(i=0;i<vocabularyData.length;i++){b=getEl('btn-level-'+i);if(b){removeClass(b,'active');}}b=getEl('btn-level-'+currentLevelIndex);if(b){addClass(b,'active');}}
+function levelTap(e,index){var el=(e&&e.currentTarget)?e.currentTarget:null;if(isDuplicateTap(e,el)){return stopEvent(e);}loadLevel(index);return stopEvent(e);}
+function staticCardTap(e,el){if(isDuplicateTap(e,el)){return stopEvent(e);}cardClicked(el,parseInt(el.getAttribute('data-match'),10),el.getAttribute('data-lang'),el.getAttribute('data-text'));return stopEvent(e);}
+function nextLevelTap(e){var el=(e&&e.currentTarget)?e.currentTarget:null;if(isDuplicateTap(e,el)){return stopEvent(e);}nextLevel();return stopEvent(e);}
+function bindCard(el,item){el.onclick=function(ev){return staticCardTap(ev||window.event,this);};el.ontouchend=function(ev){return staticCardTap(ev||window.event,this);};}
+function loadLevel(index){var level=vocabularyData[index],items=[],i,p,board,a;if(!level){return;}currentLevelIndex=index;firstSelectedCard=null;matchedPairsCount=0;isProcessing=false;totalPairs=level.pairs.length;setText(getEl('level-title'),'Màn '+(index+1)+': '+level.title);setText(getEl('score'),'0');setText(getEl('total-pairs'),String(totalPairs));updateActiveButton();removeClass(getEl('victory-screen'),'show');for(i=0;i<level.pairs.length;i++){p=level.pairs[i];items.push({matchId:i,lang:'en',text:p.en});items.push({matchId:i,lang:'vi',text:p.vi});}shuffle(items);board=getEl('game-board');if(!board){return;}while(board.firstChild){board.removeChild(board.firstChild);}for(i=0;i<items.length;i++){p=items[i];a=document.createElement('a');a.href='#';a.className='card lang-'+p.lang;a.setAttribute('data-match',String(p.matchId));a.setAttribute('data-lang',p.lang);a.setAttribute('data-text',p.text);setText(a,p.text+(p.lang=='en'?'  [loa]':''));bindCard(a,p);board.appendChild(a);}}
+function cardClicked(el,matchId,lang,text){if(!el||isProcessing||hasClass(el,'matched')){return;}if(lang=='en'){playEnglishAudio(text);}if(firstSelectedCard&&firstSelectedCard.el===el){removeClass(el,'selected');firstSelectedCard=null;return;}addClass(el,'selected');if(!firstSelectedCard){firstSelectedCard={el:el,matchId:matchId,lang:lang};return;}isProcessing=true;var first=firstSelectedCard;if(first.matchId==matchId&&first.lang!=lang){window.setTimeout(function(){addClass(first.el,'matched');addClass(el,'matched');matchedPairsCount++;setText(getEl('score'),String(matchedPairsCount));firstSelectedCard=null;isProcessing=false;if(matchedPairsCount==totalPairs){window.setTimeout(function(){addClass(getEl('victory-screen'),'show');},220);}},160);}else{addClass(first.el,'wrong');addClass(el,'wrong');window.setTimeout(function(){removeClass(first.el,'selected');removeClass(first.el,'wrong');removeClass(el,'selected');removeClass(el,'wrong');firstSelectedCard=null;isProcessing=false;},330);}}
+function nextLevel(){var n=currentLevelIndex+1;if(n>=vocabularyData.length){n=0;}loadLevel(n);}
+/* If this runs, JS is working in the current viewer/browser. */
+try{var w=getEl('js-warning');if(w){w.style.display='none';}if(!(window.speechSynthesis&&window.SpeechSynthesisUtterance)){getEl('audio-note').style.display='block';}}catch(ex){}
+</script>
+</body>
+</html>
